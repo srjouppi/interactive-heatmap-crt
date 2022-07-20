@@ -45,11 +45,11 @@
     <p>An analysis of 7,500 <a href="https://api.gdeltproject.org/api/v2/summary/summary?d=iatv" target="_blank">15-second clips</a> of Fox News broadcasts mentioning critical race theory shows how the media outlet's coverage shifted sharply from government trainings to schools in early 2021, long before protests began."</p>
   </div>
   <div id="my_dataviz"></div>
+  <script src="heatmap.js"></script>
   <div class="text-container">
    <p> A new concept is making its way into Fox's CRT coverage: gender. For the past several months, 1 out of every 10 clips mentioning "Critical Race Theory" have also mentioned gender.</p>
   </div>
-</body>
-<script>
+  <script>
   // set the dimensions and margins of the graph
   // var margin = {top: 80, right: 25, bottom: 30, left: 200}
 var margin = {top: 100, right: 25, bottom: 30, left: 200},
@@ -133,7 +133,7 @@ d3.csv("crt_words.csv", function(data) {
     tooltip
     
       .html("<h2>" + d.month+"<br/>"+d.word +"</h2><hr/><h3>" + d.pct_of_clips +"% of " + d.num_clips + " clips</h3>")
-      .style("left", (d3.mouse(this)[0]+550) + "px")
+      .style("left", (d3.mouse(this)[0]+450) + "px")
       .style("top", (d3.mouse(this)[1]) + 450+"px")
   }
   var mouseleave = function(d) {
@@ -191,4 +191,5 @@ svg.append("text")
 
 
 </script>
+</body>
 </html>
