@@ -70,29 +70,40 @@ d3.csv("crt_words.csv", function(data) {
     .style("border-radius", ".5px")
     .style("padding", "15px")
     .style("position", "absolute")
+    .style("width", '200px')
+    .style("pointer-events", "none");
 
   // Three function that change the tooltip when user hover / move / leave a cell
   var mouseover = function(d) {
+    // (d) => will not give you "this"
+
     tooltip
-      .style("opacity", 1)
-    d3.select(this)
+      .style("opacity", 1);
+
+    let which_square = d3.select(this).attr('id').replace( /^\D+/g, '');
+
+    d3.select("#actual-square-" + which_square)
       .style("stroke", "black")
-      .style("stroke-width",'.8px')
-      .style("opacity", 1)
+      .style("stroke-width",1.5);
+      //.style("opacity", 1);
   }
   var mousemove = function(d) {
+
     tooltip
-    
       .html("<h2>" + d.month+"<br/>"+d.word +"</h2><hr/><h3>" + d.pct_of_clips +"% of " + d.num_clips + " clips</h3>")
-      .style("left", (d3.mouse(this)[0]+450) + "px")
-      .style("top", (d3.mouse(this)[1]) + 450+"px")
+      .style("left", (d3.mouse(this)[0] + margin.left + 100 + 50) +  "px")
+      .style("top", (d3.mouse(this)[1])+ margin.top - 20 +"px")
   }
   var mouseleave = function(d) {
     tooltip
-      .style("opacity", 0)
-    d3.select(this)
-      .style("stroke", "none")
-      .style("opacity", 0.8)
+      .style("opacity", 0);
+
+    let which_square = d3.select(this).attr('id').replace( /^\D+/g, '');
+
+
+    d3.select("#actual-square-" + which_square)
+      .style("stroke", "#cdcdcd");
+      //.style("opacity", 0.8)
   }
 
   const all_clips = data.map(d=> +d.num_clips);
@@ -110,12 +121,14 @@ var square_scale = d3.scaleThreshold()
             .domain([50, 200, 800, 1000])
             .range([5, 13, 21, 29, x.bandwidth()]);
 
+  //make sure you are taking the proportional sizes of area into account!!!
+
   // add the squares
   svg.selectAll()
-    .data(data, function(d) {return d.month+':'+d.word;})
+    .data(data)
     .enter()
     .append("rect")
-    
+        .attr("id", (d,i)=> 'actual-square-'+ i)
       .attr("x", function(d) { return x(d.month) + (x.bandwidth() - square_scale(d.num_clips))/2 })
       .attr("y", function(d) { return y(d.word)  + (x.bandwidth() - square_scale(d.num_clips))/2})
       // .attr("rx", 4)
@@ -126,9 +139,27 @@ var square_scale = d3.scaleThreshold()
       .style("stroke-width", 4)
       .style("stroke", "none")
       .style("opacity", 1)
-      .on("mouseover", mouseover)
-      .on("mousemove", mousemove)
-      .on("mouseleave", mouseleave)
+      .style("stroke", "#cdcdcd")
+      .style("stroke-width", 1)
+      
+      svg.selectAll()
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("id", (d,i)=> 'fake-square-'+ i)
+        .attr("width", x.bandwidth())
+        .attr("height", x.bandwidth())
+        .attr("x", function(d) { return x(d.month)  })
+        .attr("y", function(d) { return y(d.word) })
+        // .style('stroke', "#F0f")
+        .style("fill-opacity", "0")
+        .on("mouseover", mouseover)
+        .on("mousemove", mousemove)
+        .on("mouseleave", mouseleave);
+
+
+
+
 })
 
 // Add title to graph
