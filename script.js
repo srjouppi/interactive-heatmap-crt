@@ -27,6 +27,7 @@ d3.csv("crt_words.csv", function(data) {
     .range([ 0, width ])
     .domain(myGroups)
     .padding(0.1);
+    
   svg.append("g")
     .style("font-size", "14px")
     .style("font-family", "Roboto Mono")
@@ -94,9 +95,20 @@ d3.csv("crt_words.csv", function(data) {
       .style("opacity", 0.8)
   }
 
-  var scale = d3.scaleLinear()
-            .domain([d3.min(data), d3.max(data)])
-            .range([4, 1400]);
+  const all_clips = data.map(d=> +d.num_clips);
+
+  //console.log(all_clips);
+
+  //linear version, clamped with the smallest square of 10
+//   var square_scale = d3.scaleLinear()
+//             .domain([d3.min(all_clips), d3.max(all_clips)])
+//             .range([10, x.bandwidth()]);
+
+// bucketed versions
+//console.log(x.bandwidth());
+var square_scale = d3.scaleThreshold()
+            .domain([50, 200, 800, 1000])
+            .range([5, 13, 21, 29, x.bandwidth()]);
 
   // add the squares
   svg.selectAll()
@@ -104,12 +116,12 @@ d3.csv("crt_words.csv", function(data) {
     .enter()
     .append("rect")
     
-      .attr("x", function(d) { return x(d.month) })
-      .attr("y", function(d) { return y(d.word) })
+      .attr("x", function(d) { return x(d.month) + (x.bandwidth() - square_scale(d.num_clips))/2 })
+      .attr("y", function(d) { return y(d.word)  + (x.bandwidth() - square_scale(d.num_clips))/2})
       // .attr("rx", 4)
       // .attr("ry", 4)
-      .attr("width", x.bandwidth() )
-      .attr("height", y.bandwidth() )
+      .attr("width", d=> square_scale(d.num_clips))
+      .attr("height",  d=> square_scale(d.num_clips))
       .style("fill", function(d) { return myColor(d.pct_of_clips)} )
       .style("stroke-width", 4)
       .style("stroke", "none")
